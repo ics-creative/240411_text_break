@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=960, initial-scale=1.0"/>
+  <title>CSSでの文章の折り返し指定 - ICS</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      padding-left: 32px;
+      padding-right: 32px;
+    }
+
+    #app {
+      margin: 0 auto;
+    }
+
+    .wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 32px;
+    }
+
+    .item {
+      padding: 16px;
+      box-sizing: border-box;
+      border-radius: 8px;
+      background-color: #eee;
+    }
+
+    .code {
+      font-family: Menlo, monospace;
+      font-weight: bold;
+      font-size: 1.4rem;
+    }
+
+    .code-prop {
+      color: #2549cc;
+    }
+
+    .code-colon {
+      color: #0f0f0f;
+    }
+
+    .code-value {
+      color: #377b2a;
+    }
+
+    .column-2 {
+      display: flex;
+      gap: 16px;
+    }
+
+    .column-2-first {
+      flex-shrink: 0;
+      width: 50%;
+    }
+
+    .column-2-second {
+      /* min-width: 0; */
+    }
+  </style>
+</head>
+<body>
+
+<div v-for="o in list">
+
+  <div id="app">
+
+    <h2>overflow-wrap</h2>
+    <div class="wrap">
+      <div v-for="o in listOverflowWrap" class="item">
+        <div v-bind:style="{ overflowWrap: o }">
+          <p class="code"><span class="code-prop">overflow-wrap</span><span class="code-colon">:</span> <span
+                  class="code-value">{{ o }};</span></p>
+          <p><a href="#">{{sentenceUrl}}</a></p>
+          <p>{{sentenceJa}}</p>
+          <div class="column-2">
+            <!-- 幅固定 -->
+            <p class="column-2-first">{{sentenceEn}}</p>
+            <!-- ここに違いがでる -->
+            <p class="column-2-second">{{sentenceUrl}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2>word-break</h2>
+    <div class="wrap">
+      <div v-for="o in listWordBreak" class="item">
+        <div v-bind:style="{ wordBreak: o }">
+          <p class="code"><span class="code-prop">wordBreak</span><span class="code-colon">:</span> <span
+                  class="code-value">{{ o }};</span></p>
+          <p>{{sentenceJa}}</p>
+          <p><a href="#">{{sentenceUrl}}</a></p>
+          <p>{{sentenceEn}}</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>line-break</h2>
+    <div class="wrap">
+      <div v-for="o in listLineBreak" class="item">
+        <div v-bind:style="{ lineBreak: o }">
+          <p class="code"><span class="code-prop">line-break</span><span class="code-colon">:</span> <span
+                  class="code-value">{{ o }};</span></p>
+          <p>{{sentenceJa}}</p>
+        </div>
+      </div>
+    </div>
+
+
+    <h2>hyphens</h2>
+    <div class="wrap">
+      <div v-for="o in listHypens" class="item">
+        <div v-bind:style="{ hyphens: o }">
+          <p class="code"><span class="code-prop">hyphens</span><span class="code-colon">:</span> <span
+                  class="code-value">{{ o }};</span></p>
+          <p lang="en">{{sentenceEn}}</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>word-break と overflow-wrap の組み合わせ</h2>
+    <div class="wrap">
+      <div v-for="o in listMatrix" class="item">
+        <div v-bind:style="{ wordBreak: o.wordBreak, overflowWrap: o.overflowWrap }">
+          <p class="code"><span class="code-prop">word-break</span><span class="code-colon">:</span> <span
+                  class="code-value">{{ o.wordBreak }};</span> <br/><span class="code-prop">overflow-wrap</span><span
+                  class="code-colon">:</span> <span class="code-value">{{ o.overflowWrap }};</span></p>
+          <p>{{sentenceJa}}</p>
+          <p><a href="#">{{sentenceUrl}}</a></p>
+          <p>{{sentenceEn}}</p>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+</div>
+
+<script type="module">
+  import {createApp, ref} from "https://unpkg.com/vue@3.2.4/dist/vue.esm-browser.prod.js";
+
+
+  const app = createApp({
+    setup() {
+
+      const listWordBreak = ["normal", "break-all", "keep-all"];
+      const listOverflowWrap = ["normal", "break-word", "anywhere",];
+      const listLineBreak = ["auto", "anywhere", "strict",];
+      const listHypens = ["none", "auto", "manual",];
+      const listMatrix = [];
+      for (let o1 of listWordBreak) {
+        for (let o2 of listOverflowWrap) {
+          listMatrix.push({
+            wordBreak: o1,
+            overflowWrap: o2,
+          })
+        }
+      }
+
+      const sentenceJa = `この文章は、テキストの折り返しポイントを確認するために用意しました。ブラウザの幅を調整して、折り返しがどのように発生するか観察してみてください。とくに、カギ括弧や読点などの特定の文字が折り返し位置にどのように影響するかに注目してください。例えば、「桜がぁ、咲いたよぉ」「やぁ、元気かい？」「日々是精進」というフレーズを見てみましょう。では、この文章の最初にどのような文字が表示されるか、確認してみてください。`;
+      const sentenceUrl = "https://example.com/document/abcdefghijklmnopqrstuvwxyz1234567890"
+      const sentenceEn = `This manuscript is intentionally constructed to facilitate the examination of textual line-break
+peculiarities within varying browser dimensions. By manipulating the horizontal expansiveness of your
+viewing portal, one can meticulously observe the manifestation of distinct line-break junctures. What character, pray tell,
+inaugurates this textual composition?`;
+
+      return {
+        listWordBreak,
+        listOverflowWrap,
+        listLineBreak,
+        listHypens,
+        listMatrix,
+        sentenceJa,
+        sentenceUrl,
+        sentenceEn
+      };
+    },
+  });
+  app.mount("#app");
+</script>
+</body>
+</html>
